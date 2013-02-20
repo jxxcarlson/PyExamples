@@ -11,6 +11,8 @@
 # Author: J. Carlson
 # Date: 2/19/2013
 # Site for images: square-the-circle.com
+#
+# REQUIRES: utilities.py, this site
 
 import sys 
 from utilities import saveImage
