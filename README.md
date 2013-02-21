@@ -5,9 +5,9 @@ Simple Python examples for an eventual book. Some images created with these exam
 
 CONTENTS:
 
-cross.py         -- draw fractal cross (turtle graphics, recursion)
-
 rosetta.py       -- draw resoetta figure (square repeatedly rotated)
+
+star.py         -- draw n-rayed fractal star (turtle graphics, recursion)
 
 rw.py            -- simulation of random walk
 
