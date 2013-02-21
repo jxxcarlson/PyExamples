@@ -17,7 +17,6 @@ import sys
 from utilities import saveImage
 from turtle import *
 
-
 def star(turtle, n,r):
   """ draw a star of n rays of length d"""
   for k in range(0,n):
@@ -44,7 +43,6 @@ def recursive_star(turtle, n, r, depth):
       turtle.penup()
       turtle.backward(r)
       turtle.left(360/n)
- 
  
 fred = Turtle()
 fred.speed("fastest")
