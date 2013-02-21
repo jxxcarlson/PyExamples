@@ -48,7 +48,6 @@ def recursive_star(turtle, n, r, depth):
  
 fred = Turtle()
 fred.speed("fastest")
-# star(fred, 20, 100) # draw a 20-star
 
 # Draw a fractal star of depth sys.argv[2] with sys.argv[1] rays:
 recursive_star(fred, int(sys.argv[1]), 200, int(sys.argv[2]))
