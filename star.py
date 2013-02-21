@@ -1,9 +1,9 @@
 # Draw n-rayed fractal star using recursion
 # Usage:
 #
-#   % pp star.py 4 3 cross -- draw 4-pointed fractal star of depth 3
+#   % python3 star.py 4 3 cross -- draw 4-pointed fractal star of depth 3
 #                          -- save image in file named "cross3.eps"
-#   % pp star.py 4 3       -- as above, but do not save image
+#   % python3 star.py 4 3       -- as above, but do not save image
 #
 # Language: Python 3.3
 # Author: J. Carlson
