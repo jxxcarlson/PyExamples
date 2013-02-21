@@ -1,4 +1,10 @@
 # Draw n-rayed fractal star using recursion
+# Usage:
+#
+#   % pp star.py 4 3 cross -- draw 4-pointed fractal star of depth 3
+#                          -- save image in file named "cross3.eps"
+#   % pp star.py 4 3       -- as above, but do not save image
+#
 # Language: Python 3.3
 # Author: J. Carlson
 # Date: 2/19/2013
@@ -41,9 +47,10 @@ fred = Turtle()
 fred.speed("fastest")
 # star(fred, 20, 100) # draw a 20-star
 
-# Draw a fractal cross of depth 4:
-recursive_star(fred, 6, 200, int(sys.argv[1]))
+# Draw a fractal cross of depth sys.argv[1]:
+recursive_star(fred, int(sys.argv[1]), 200, int(sys.argv[2]))
 fred.hideturtle()
-saveImage(fred, "snofwlake2.eps")
+if len(sys.argv) == 4:
+  saveImage(fred, sys.argv[3]+sys.argv[2]+".eps")
 exitonclick()  
     
