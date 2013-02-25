@@ -7,6 +7,8 @@ CONTENTS:
 
 rosetta.py       -- draw resoetta figure (square repeatedly rotated)
 
+sm.py           -- stack machine (for CS fun)
+
 star.py         -- draw n-rayed fractal star (turtle graphics, recursion)
 
 rw.py            -- simulation of random walk
