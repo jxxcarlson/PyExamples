@@ -1,5 +1,5 @@
 """sm.py: Stack machine
-Examples:
+  Examples:
 
   >>> from sm import *
   >>> run("1 2 add")
