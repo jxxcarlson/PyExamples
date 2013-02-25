@@ -1,22 +1,4 @@
-"""sm.py: Stack machine
-  Examples:
-
-  >>> from sm import *
-  >>> run("1 2 add")
-  3
-  >>> run("2 3 add 2 mul 2 div 1 sub")
-  4.0
-  >>> run("3 a sto a rcl")
-  3 
-  >>> # define 'cube' which cubes its argument
-  >>> run("defprog cube dup dup mul mul /defprog 3 cube")
-  27
-  >>> # compute sum of squares of 3 and 4
-  >>> run("3 a sto 4 b sto a rcl square b rcl square add")
-
-  Say set_vebosity(True) to see stack machine in operation
-  Say set_verbosity(False) to see results only 
-"""
+"""sm.py: Stack machine.  Use 'python3 sm.py -e to see exmples."""
 
 import sys
 
@@ -95,6 +77,10 @@ def clear_op(stack):
 
 def clear_stack(stack):
   stack = []
+  
+# DICTIONAY WHICH DEFINES THE INSTRUCTION SET.  KEYS ARE INSTRUCTIONS (STRINGS).
+# VALUES ARE PAIRS: A TUPLE WHOSE FIRST ELEMENT GIVES THE INSTRUCTION TYPE
+# AND WHOSE SECOND ELEMENT IS A FUNCTION.
 ops = {'sto':('stack', sto), 'rcl':('stack', rcl), 'dup': ('stack', dup),
         'report':('stack', report), 'pop':('stack', popstack), 'clear_op':('stack', clear_op),
         'show_ops':('stack', show_ops), 'clear_stack':('stack', clear_stack),
@@ -271,7 +257,7 @@ def ex(code):
     return S.pop() 
   else:
     return None  
-  
+	
 	
 def run(input):
   """run(input): parse the input string and run the resulting code.
@@ -284,9 +270,14 @@ def run(input):
 
 verbose = True
 
+def set_verbosity(b):
+  """set_verbosity(b): set global verbosity flag (True/False)."""
+  global verbose
+  verbose = b
+
+
 def _test():
-    global verbose
-    verbose = False
+    set_verbosity(False)
     import doctest
     doctest.testmod()
 
@@ -325,12 +316,7 @@ def test_programs():
   >>> run("3 a sto 4 b sto a rcl square b rcl square add")
   25
   '''
-  
-def set_verbosity(b):
-  """set_verbosity(b): set global verbosity flag (True/False)."""
-  global verbose
-  verbose = b
-    
+      
 ##########################################################
 
 message = """ 
@@ -366,7 +352,6 @@ if __name__ == "__main__":
   else:
     code = sys.argv[1:]
     result = ex(code)
-    print()
     print(result)
     print()
 
