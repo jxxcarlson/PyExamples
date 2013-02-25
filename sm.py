@@ -11,7 +11,8 @@ def _print(x):
   
 def print_documentation():
   _print("FUNCTIONS:")
-  _print(set_verbosity.__doc__)
+  _print(verbosity_on.__doc__)
+  _print(verbosity_off.__doc__)
   _print(run.__doc__)
   _print(ex.__doc__)
   print()
@@ -275,9 +276,16 @@ def set_verbosity(b):
   global verbose
   verbose = b
 
-
+def verbosity_on():
+  """verbosity_on(): set global verbosity flag to True."""
+  set_verbosity(True)
+  
+def verbosity_off():
+  """verbosity_off(): set global verbosity flag to False."""
+  set_verbosity(False)
+  
 def _test():
-    set_verbosity(False)
+    verbosity_off()
     import doctest
     doctest.testmod()
 
@@ -334,7 +342,7 @@ message = """
 ##########################################################
 
 if __name__ == "__main__": 
-  set_verbosity(True) # default
+  verbosity_on() # default
 
   # GET INPUT FOR INTERPRETER
   if len(sys.argv) == 1:
