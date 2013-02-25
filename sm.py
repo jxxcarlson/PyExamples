@@ -1,11 +1,21 @@
 """sm.py: Stack machine
+Examples:
 
-Try this:
+  >>> from sm import *
+  >>> run("1 2 add")
+  3
+  >>> run("2 3 add 2 mul 2 div 1 sub")
+  4.0
+  >>> run("3 a sto a rcl")
+  3 
+  >>> # define 'cube' which cubes its argument
+  >>> run("defprog cube dup dup mul mul /defprog 3 cube")
+  27
+  >>> # compute sum of squares of 3 and 4
+  >>> run("3 a sto 4 b sto a rcl square b rcl square add")
 
-  % python3 sm.py 3      # or any integer 1-13
-  
-
-
+  Say set_vebosity(True) to see stack machine in operation
+  Say set_verbosity(False) to see results only 
 """
 
 import sys
