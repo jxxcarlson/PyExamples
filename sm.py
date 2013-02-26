@@ -1,7 +1,14 @@
-"""sm.py: Stack machine.  Use 'python3 sm.py -e to see exmples."""
+"""sm.py: Stack machine.  Use 'python3 sm.py -e to see examples."""
 
 import sys
 
+"""
+Contents:
+
+  - Documentation
+  - Instruction set
+
+"""
 ##########################################################
 # DOCUMENTATION
 ##########################################################
@@ -17,74 +24,101 @@ def print_documentation():
   _print(ex.__doc__)
   print()
 
+def print_examples():
+  print("\n  More examples.  These are the 'unit tests' run using 'python3 sm.py -t'")
+  print("  >>> from sm import *")
+  print(test_instructions.__doc__)
+  print(test_programs.__doc__)
+  
+
+##########################################################
+# UTILITY
+##########################################################
+
+
 ##########################################################
 # INSTRUCTION SET
 ##########################################################
 
 def add(stack):
+  """Pop top two values of stack, add them, push result onto stack."""
   val = stack.pop() + stack.pop()
   stack.append(val)
  
 def mul(stack):
+  """Pop top two values of stack, multiply them, push result onto stack."""
   val = stack.pop() * stack.pop()
   stack.append(val)
 
 def sub(stack):
+  """Pop top two values of stack, subtract second from first, push result onto stack."""
   a = stack.pop()
   b = stack.pop()
   val = b - a
   stack.append(val)
   
 def div(stack):
+  """Pop top two values of stack, divide second by first, push result onto stack."""
   denom = stack.pop()
   num = stack.pop()
   val = num / denom
   stack.append(val)
   
 def INT(stack):
+  """Pop top values of stack, take integer part, push result onto stack."""
   stack.append(int(stack.pop()))
   
 def pi(stack):
+  """Push value of pi onto stack."""
   stack.append(3.131459265)
 
 def dup(stack):
+  """Put copy of top value of stack onto stack."""
   stack.append(top(stack))
   
 def sto(stack):
-  # STACK: 7 A sto <top>
+  """Pop stack[top], stack[top-1].  Install stack[top-1] in opTable,
+  set value to ('var', stack[top]).
+  # STACK: 7 A sto <top>"""
   var = stack.pop()
   val = ('var', stack.pop())
-  ops[var] = val
+  opTable[var] = val
   
 def rcl(stack):
+  """Pop top of stack, let op be the result.  Push opTable[op][1] onto stack."""
   # STACK: A <top> ==> STACK: 7 <top>
   op = stack.pop()
-  opVal = ops[op]
+  opVal = opTable[op]
   stack.append(opVal[1])
     
 def report(stack):
-  print(stack)
+  """Print the stack."""
+  print("STACK:", stack)
 
 def popstack(stack):
+  """Pop stack."""
   stack.pop()
   
-def show_ops(stack):
-  for key in ops:
-    print(key, ops[key])
+def show_opTable(stack):
+  """print operator table."""
+  for key in opTable:
+    print(key, opTable[key])
     
 def clear_op(stack):
+  """Pop name from stack and clear it from the operator table."""
   key = stack.pop()
-  ops.pop(key, None)
+  opTable.pop(key, None)
 
 def clear_stack(stack):
+  """Clear the stack."""
   stack = []
   
 # DICTIONAY WHICH DEFINES THE INSTRUCTION SET.  KEYS ARE INSTRUCTIONS (STRINGS).
 # VALUES ARE PAIRS: A TUPLE WHOSE FIRST ELEMENT GIVES THE INSTRUCTION TYPE
 # AND WHOSE SECOND ELEMENT IS A FUNCTION.
-ops = {'sto':('stack', sto), 'rcl':('stack', rcl), 'dup': ('stack', dup),
+opTable = {'sto':('stack', sto), 'rcl':('stack', rcl), 'dup': ('stack', dup),
         'report':('stack', report), 'pop':('stack', popstack), 'clear_op':('stack', clear_op),
-        'show_ops':('stack', show_ops), 'clear_stack':('stack', clear_stack),
+        'show_opTable':('stack', show_opTable), 'clear_stack':('stack', clear_stack),
        'add': ('stack', add), 'sub': ('stack', sub), 'mul': ('stack', mul), 'div': ('stack',div),
         'int': ('stack', INT), 'pi':('stack', pi), 'double':('code', [2, 'mul']),
          'square':('prog', ('dup', 'mul')) }
@@ -102,11 +136,40 @@ Language: defcode, defprog
 # INTERPRETER
 ##########################################################
 
+def vprint(verbose, x, y):
+  if verbose:
+    print(x,y)
+
+def top(stack):
+  if len(stack) > 0:
+    return stack[-1]
+  else:
+    return "NONONO!"
+    
+def is_executable(op):
+  if op not in opTable:
+    return False
+  opType, opValue = opTable[op]
+  if opType == 'var':
+    return False
+  else:
+    return True
+
+def evaluate(x):
+  if x[0].isalpha():
+    return x
+  elif x.find(".") > -1:
+    return float(x)
+  else:
+    return int(x)
+    
 def pushvector(v, stack):
+  """Push the elements of the vector (list, tuple) onto the stack."""
   for element in v:
     stack.append(element)
     
 def exprog(prog, stack):
+  """Execut the program 'prog'."""
   global verbose
   
   stack.pop()
@@ -117,126 +180,97 @@ def exprog(prog, stack):
     vprint(verbose, "prog:", prog[i:])
     exop(stack)
     i = i + 1
-    
+
+def exstackop(operator, stack):
+  stack.pop()
+  operator(stack)
+
+def excode(operator, stack):
+  stack.pop()
+  pushvector(operator, stack)
+
+def ex_nothing(operator, stack):
+  pass
+
+ex_table = { }
+ex_table['var'] = ex_nothing
+ex_table['code'] = excode
+ex_table['stack']= exstackop
+ex_table['prog'] = exprog
+
 def exop(stack):
+  """Execute the operator which is at the top of the stack.
+  Find the type of the operator, then dispatch """
   global verbose
   vprint(verbose, "in exop, stack:", stack)
   
-  op = top(stack) 
-  if op in ops:
-    
-    operatorType, operatorValue = ops[op]
-   
-    if operatorType == 'var':
-      # stack.pop()
-      # stack.append(operatorValue)
-      # stack.append(op)
-      # stack.append('halt')
-      pass
-    elif operatorType == 'code':
-      op = stack.pop()
-      pushvector(operatorValue, stack)
-    elif operatorType == 'stack':
-      stack.pop()
-      operatorValue(stack)
-    elif operatorType == 'prog':
-      exprog(operatorValue, stack)
-    else:
-      print("error, unknown operator type")
-      exit()
- 
+  op = top(stack)
+  operatorType, operator = opTable[op]
+  f = ex_table[operatorType]
+  f(operator, stack)
+  
 def excodedef(code, i):
   global verbose
-  global ops
+  global opTable
   
   op = code[i+1]
   currentcode = code[i+1:]
-  j = code.index('/defcode')  # BUG HERE!!
-  codebody = list(map(evaluate, code[i+2:j]))
-  i = j  # ADVANCE TO FIRST TOKEN BEYOND THE DEFINITION
-  ops[op] = ('code', codebody)
+  def_end = code.index('/defcode')  # BUG HERE!!
+  codebody = list(map(evaluate, code[i+2:def_end]))
+  i = def_end  # ADVANCE TO FIRST TOKEN BEYOND THE DEFINITION
+  opTable[op] = ('code', codebody)
   vprint(verbose, "new op:", op)
-  vprint(verbose, "codebody:", ops[op])
-  return i,j
+  vprint(verbose, "codebody:", opTable[op])
+  return i,def_end
 
 def exprogdef(code, i):
   global verbose  
-  global ops
+  global opTable
   
   op = code[i+1]
   currentcode = code[i+1:]
-  j = code.index('/defprog')  # BUG HERE!!
-  codebody = list(map(evaluate, code[i+2:j]))
-  i = j  # ADVANCE TO FIRST TOKEN BEYOND THE DEFINITION
+  def_end = code.index('/defprog')  # BUG HERE!!
+  codebody = list(map(evaluate, code[i+2:def_end]))
+  i = def_end  # ADVANCE TO FIRST TOKEN BEYOND THE DEFINITION
   
   vprint(verbose, "defcode, op", op)
   vprint(verbose, "defcode, codebody:", codebody)
   vprint(verbose, "remaining code", code[i:])
   
-  ops[op] = ('prog', codebody)
+  opTable[op] = ('prog', codebody)
   
   vprint(verbose, "new op:", op)
-  vprint(verbose, "codebody:", ops[op])
+  vprint(verbose, "codebody:", opTable[op])
   
-  return i,j
-      
-def evaluate(x):
-  if x[0].isalpha():
-    return x
-  elif x.find(".") > -1:
-    return float(x)
-  else:
-    return int(x)
-    
-def vprint(verbose, x, y):
-  if verbose:
-    print(x,y)
-  
-def top(stack):
-  if len(stack) > 0:
-    return stack[-1]
-  else:
-    return "NONONO!"
-    
-def is_executable(op):
-  if op not in ops:
-    return False
-  opType, opValue = ops[op]
-  if opType == 'var':
-    return False
-  else:
-    return True
-    
-def run(input):
-  return ex(input.split(" "))
-    
+  return i,def_end
+          
 def ex(code):
   """ex(code):  execute a list or tuple of strings representing instructions and data.
   Example: ex(['1', '2', 'add']) or ex(('1', '2', 'add'))."""
   global verbose
-  global ops
+  global opTable
   vprint(verbose, "=================================", "")
   vprint(verbose, "code:", code)
   
-  # SET UP STACK AND CODE POINTERS i, j
+  # SET UP STACK AND CODE POINTERS ip, def_end
   S = []
-  i = 0; j = 0
+  ip = 0; def_end = 0
   
   # MAIN LOOP
-  while (i < len(code)) & (top(S) != 'halt'):
+  while (ip < len(code)) & (top(S) != 'halt'):
   
     # GET NEXT TOKEN
-    token = code[i]
+    token = code[ip]
     
     vprint(verbose, "---------", "")
     vprint(verbose, "token:", token)
     
-    # PROCESS TOKEN
+    # PROCESS TOKEN: 
 
     if token == 'defcode':
-      i,j = excodedef(code,i)
+      ip,def_end = excodedef(code,ip)
     elif token == 'defprog':
-      i,j = exprogdef(code,i)
+      ip,def_end = exprogdef(code,ip)
     else:
       S.append(evaluate(token))
      
@@ -247,9 +281,9 @@ def ex(code):
     
     # ADVANCE TOKEN CURSOR AND ENSURE THAT 
     # IT IS TO THE RIGHT OF THE LAST DEFINITION PROCESSED
-    i = i + 1
-    if j > i:
-      i = j
+    ip = ip + 1
+    if def_end > ip:
+      ip = def_end
     
   vprint(verbose, "==============", "")
   
@@ -308,6 +342,10 @@ def test_instructions():
   4.0
   >>> run("3 a sto a rcl")
   3
+  >>> run("1 2 halt add")
+  'halt'
+  >>> run("1 2 foo bar")
+  'bar'
   '''
 
 def test_programs():
@@ -340,28 +378,50 @@ message = """
   """
 
 ##########################################################
+# MAIN
+##########################################################
+
+# Table of functions versus options
+option_table = { }
+option_table['-t'] = _test
+option_table['-d'] = print_documentation
+option_table['-e'] = print_examples
+option_table['-v'] = verbose_on
+option_table['-u'] = verbose_off
+
+def run_option(arg):
+  arg = sys.argv[1]
+  if arg in option_table:
+    f = option_table[arg]
+    f()
+
+def process_args(arglist):
+  if len(arglist) == 0:
+    return None
+  arg = arglist[0]
+  if arg[0] == "-":
+    run_option(arg)
+    process_args(arglist[1:])
+  else:
+    code = arglist
+    ex_input(code)
+     
+  
+
+def ex_input(input):
+  result = ex(input)
+  print(result, "\n")
 
 if __name__ == "__main__": 
   verbose_on() # default
 
-  # GET INPUT FOR INTERPRETER
+  # PROCESS ARGS
   if len(sys.argv) == 1:
     print(message)
-  elif (len(sys.argv) == 2) & (sys.argv[1][0] == "-"):
-    if sys.argv[1] == '-t':
-      _test()
-    elif sys.argv[1] == "-d":
-      print_documentation()
-    elif sys.argv[1] == "-e":
-      print("\n  More examples.  These are the 'unit tests' run using 'python3 sm.py -t'")
-      print("  >>> from sm import *")
-      print(test_instructions.__doc__)
-      print(test_programs.__doc__)
   else:
-    code = sys.argv[1:]
-    result = ex(code)
-    print(result)
-    print()
+    process_args(sys.argv[1:])
+ 
+    
+    
 
-# pp rpn.py defprog cube dup dup mul mul /defprog 3 cube
-# pp rpn.py defprog quad dup mul dup mul /defprog 3 quad
+
