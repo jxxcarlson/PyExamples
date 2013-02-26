@@ -31,10 +31,17 @@ def print_examples():
   print(test_programs.__doc__)
   
 
-##########################################################
-# UTILITY
-##########################################################
+message = """ 
+  python3 sm.py 1 2 add      -- simple example, command line
+  >>> run('1 2 add')         -- same example, interactive mode
+  >>> ex(['1', '2', 'add'])  -- same example, list input
+  
+  python3 sm.py -e            -- more examples 
+  python3 sm.py -t            -- internal test
+  python3 sm.py -d            -- print documentation
 
+  have a nice day
+  """
 
 ##########################################################
 # INSTRUCTION SET
@@ -364,20 +371,6 @@ def test_programs():
   '''
       
 ##########################################################
-
-message = """ 
-  python3 sm.py 1 2 add      -- simple example, command line
-  >>> run('1 2 add')         -- same example, interactive mode
-  >>> ex(['1', '2', 'add'])  -- same example, list input
-  
-  python3 sm.py -e            -- more examples 
-  python3 sm.py -t            -- internal test
-  python3 sm.py -d            -- print documentation
-
-  have a nice day
-  """
-
-##########################################################
 # MAIN
 ##########################################################
 
@@ -395,6 +388,10 @@ def run_option(arg):
     f = option_table[arg]
     f()
 
+def ex_input(input):
+  result = ex(input)
+  print(result, "\n")
+
 def process_args(arglist):
   if len(arglist) == 0:
     return None
@@ -405,12 +402,6 @@ def process_args(arglist):
   else:
     code = arglist
     ex_input(code)
-     
-  
-
-def ex_input(input):
-  result = ex(input)
-  print(result, "\n")
 
 if __name__ == "__main__": 
   verbose_on() # default
