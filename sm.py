@@ -1,4 +1,67 @@
-"""sm.py: Stack machine.  Use 'python3 sm.py -e to see examples."""
+"""sm.py: Stack machine.  Use 'python3 sm.py -e to see examples.
+  
+  # turn verbose mode off for testing
+  # turn it on using 'verbose_on()" to see stack trace
+  >>> verbose_off()
+  
+  # instruction set -- binary functions  
+  >>> run("1 2 add")
+  3
+  >>> run("1 2 sub")
+  -1
+  >>> run("2 3 mul")
+  6
+  >>> run("3 2 div")
+  1.5
+  
+  # builtin constant
+  >>> run("pi")
+  3.131459265
+  
+  # builtin unary function
+  >>> run("1.5 int")
+  1
+  
+  # many instructions:
+  >>> run("2 3 add 2 mul 2 div 1 sub")
+  4.0
+  
+  # variables
+  >>> run("3 a sto a rcl")
+  3
+  
+  # use of (builtin) function
+  >>> # compute sum of squares of 3 and 4
+  >>> run("3 a sto 4 b sto a rcl square b rcl square add")
+  25
+  
+  # halt machine
+  >>> run("1 2 halt add")
+  'halt'
+  
+  # unknown instructions 'ignored' -- just pushed to stack
+  >>> run("1 2 foo bar")
+  'bar'
+  
+  # stack instructions
+  >>> run("3 dup mul")
+  9
+  
+  # define function as code --- can be pushed onto stack and executed
+  >>> # define doubling function, apply it to 7:
+  >>> run("defcode db 2 mul /defcode 7 db") 
+  14
+  
+  # defined function as prog --- execute each instruction using interpreter
+  >>> # define 'cube' which cubes its argument
+  >>> run("defprog cube dup dup mul mul /defprog 3 cube")
+  27
+  
+  To add new instructions, add entries to the dictionary 'opTable',
+  then add the corresponding function.  See, for example, how the 
+  functions 'add' (binary), 'int' (unary), and 'pi' (0-ary) are 
+  implemented. 
+"""
 
 import sys
 
@@ -22,23 +85,23 @@ def print_documentation():
   _print(verbose_off.__doc__)
   _print(run.__doc__)
   _print(ex.__doc__)
-  print()
-
-def print_examples():
-  print("\n  More examples.  These are the 'unit tests' run using 'python3 sm.py -t'")
-  print("  >>> from sm import *")
-  print(test_instructions.__doc__)
-  print(test_programs.__doc__)
-  
+  print()  
 
 message = """ 
-  python3 sm.py 1 2 add      -- simple example, command line
-  >>> run('1 2 add')         -- same example, interactive mode
-  >>> ex(['1', '2', 'add'])  -- same example, list input
-  
-  python3 sm.py -e            -- more examples 
+  COMMAND LINE:
+  python3 sm.py 1 2 add       -- simple example, command line
+  python3 sm.py -s 1 2 add    -- same, silent (verbose = off)
   python3 sm.py -t            -- internal test
   python3 sm.py -d            -- print documentation
+
+  INTERACTIVE:
+  $ python3
+  >>> from sm import *
+  >>> verbose_off()          -- verbose_on() sets verbosity to default value
+  >>> run('1 2 add')         -- example, interactive mode
+  >>> ex(['1', '2', 'add'])  -- same example, list input
+  
+  Use 'verbose_on() to see stack trace
 
   have a nice day
   """
@@ -176,7 +239,7 @@ def pushvector(v, stack):
     stack.append(element)
     
 def exprog(prog, stack):
-  """Execut the program 'prog'."""
+  """Execute the program 'prog'."""
   global verbose
   
   stack.pop()
@@ -330,45 +393,10 @@ def _test():
     import doctest
     doctest.testmod()
 
+def print_docstring():
+  import sm
+  print(sm.__doc__)
 
-def test_instructions():
-  '''
-  >>> run("1 2 add")
-  3
-  >>> run("1 2 sub")
-  -1
-  >>> run("2 3 mul")
-  6
-  >>> run("3 2 div")
-  1.5
-  >>> run("pi")
-  3.131459265
-  >>> run("1.5 int")
-  1
-  >>> run("2 3 add 2 mul 2 div 1 sub")
-  4.0
-  >>> run("3 a sto a rcl")
-  3
-  >>> run("1 2 halt add")
-  'halt'
-  >>> run("1 2 foo bar")
-  'bar'
-  '''
-
-def test_programs():
-  '''
-  >>> run("3 dup mul")
-  9
-  >>> # define doubling function, apply it to 7:
-  >>> run("defcode db 2 mul /defcode 7 db") 
-  14
-  >>> # define 'cube' which cubes its argument
-  >>> run("defprog cube dup dup mul mul /defprog 3 cube")
-  27
-  >>> # compute sum of squares of 3 and 4
-  >>> run("3 a sto 4 b sto a rcl square b rcl square add")
-  25
-  '''
       
 ##########################################################
 # MAIN
@@ -377,10 +405,9 @@ def test_programs():
 # Table of functions versus options
 option_table = { }
 option_table['-t'] = _test
-option_table['-d'] = print_documentation
-option_table['-e'] = print_examples
+option_table['-d'] = print_docstring
 option_table['-v'] = verbose_on
-option_table['-u'] = verbose_off
+option_table['-s'] = verbose_off
 
 def run_option(arg):
   arg = sys.argv[1]
@@ -390,7 +417,7 @@ def run_option(arg):
 
 def ex_input(input):
   result = ex(input)
-  print(result, "\n")
+  print(result)
 
 def process_args(arglist):
   if len(arglist) == 0:
@@ -406,7 +433,12 @@ def process_args(arglist):
 if __name__ == "__main__": 
   verbose_on() # default
 
-  # PROCESS ARGS
+  # SELF TEST (runs docstring at head of module):
+  from doctest import testmod
+  import sm
+  testmod(sm)
+  
+  # PROCESS ARGS:
   if len(sys.argv) == 1:
     print(message)
   else:
