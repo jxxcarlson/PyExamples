@@ -101,18 +101,7 @@ Contents:
 """
 ##########################################################
 # DOCUMENTATION
-##########################################################
-
-def _print(x):
-  print(); print(" ", x)
-  
-def print_documentation():
-  _print("FUNCTIONS:")
-  _print(verbose_on.__doc__)
-  _print(verbose_off.__doc__)
-  _print(run.__doc__)
-  _print(ex.__doc__)
-  print()  
+##########################################################  
 
 message = """ 
   COMMAND LINE:
