@@ -1,7 +1,34 @@
-"""sm.py: Stack machine.  Use 'python3 sm.py -e to see examples.
+"""sm.py: Stack machine.  
+
+AT THE COMMAND LINE:
+  
+    See introduction to sm.py:
+    $ python3 sm.py 
+  
+    Run simple example in silent mode
+    # python3 -s sm.py 1 2 add
+    
+    Run simple example in verbose mode (default)
+    # python3 sm.py 1 2 add
+    ================================= 
+    code: ['1', '2', 'add']
+    --------- 
+    token: 1
+    stack: [1]
+    --------- 
+    token: 2
+    stack: [1, 2]
+    --------- 
+    token: add
+    in exop, stack: [1, 2, 'add']
+    stack: [3]
+    ============== 
+    3 
+    
+INTERACTIVE MODE:
   
   # turn verbose mode off for testing
-  # turn it on using 'verbose_on()" to see stack trace
+  # turn it on using 'verbose_on()' to see stack trace
   >>> verbose_off()
   
   # instruction set -- binary functions  
