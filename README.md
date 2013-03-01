@@ -5,7 +5,9 @@ Simple Python examples for an eventual book. Some images created with these exam
 
 CONTENTS:
 
-rosetta.py       -- draw resoetta figure (square repeatedly rotated)
+nautilus.py     -- draw 'nautilus'. Code almost the same as rosetta.py
+
+rosetta.py       -- draw rosetta figure (square repeatedly rotated)
 
 sm.py           -- stack machine (for CS fun)
 
