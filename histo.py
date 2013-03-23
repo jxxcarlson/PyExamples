@@ -110,14 +110,14 @@ def write_output(name, T):
 text = file2string(sys.argv[1])              # open text file
 words = get_words(text)                      # get word list
 
-if (len(sys.argv) > 2) \
-& (sys.argv[2] == "-j"):                     # filter out junk words
-  words = junk_filter(words, sys.argv[3])
+if (len(sys.argv) > 2):
+  if (sys.argv[2] == "-j"):                     # filter out junk words
+    words = junk_filter(words, sys.argv[3])
   
 h = histogram(words)                         # make dictionary of word frequencies
 table = list(h.items())                      # convert dictionary to a list
-sort_table(table)                            # sort the list
+sort_table(table)                            # sort the table
 table = relative_frequencies(table)          # compute relative frequencies
 
-print_table(table[:20])                      # output to terminal  -- top 20 words
+print_table(table[:10])                      # output to terminal  -- top 10 words
 write_output(sys.argv[1]+'.histo', table)    # output to file      -- everything
