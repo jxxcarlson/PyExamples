@@ -5,6 +5,8 @@ Simple Python examples for an eventual book. Some images created with these exam
 
 CONTENTS:
 
+histo.py        -- histogram of word frequencies in given file
+
 nautilus.py     -- draw 'nautilus'. Code almost the same as rosetta.py
 
 rosetta.py       -- draw rosetta figure (square repeatedly rotated)
